@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>訪問介護費の仕組み（スライド形式）</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Mochiy Pop One', cursive;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f1de; /* Muted yellow background */
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        .slide-container {
+            max-width: 900px;
+            width: 95%; /* Fluid width */
+            margin: 20px auto;
+            background-color: #fff; /* White background for content area */
+            padding: 30px;
+            border: 2px dashed #a8dadc; /* Dashed border */
+            border-radius: 10px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+            position: relative; /* Needed for absolute positioning of slides */
+            min-height: 500px; /* Minimum height for slides */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Push footer down */
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%; /* Take full height of container */
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 30px; /* Match container padding */
+            box-sizing: border-box;
+            opacity: 0; /* Start hidden */
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out;
+            overflow-y: auto; /* Add scroll for long content */
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            position: relative; /* Active slide takes up space */
+        }
+
+        h1, h2, h3 {
+            color: #1d3557; /* Dark blue */
+            border-bottom: 3px solid #457b9d; /* Muted blue underline */
+            padding-bottom: 5px;
+            margin-top: 20px; /* Adjusted margin for slides */
+        }
+
+        h1 {
+            text-align: center;
+            border-bottom: none;
+            margin-bottom: 30px; /* Adjusted margin */
+            color: #e63946; /* Reddish accent */
+        }
+
+         h2 {
+             margin-top: 0; /* Remove top margin for slide titles */
+         }
+
+
+        .note {
+            background-color: #a8dadc; /* Muted blue background for notes */
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #1d3557; /* Dark blue left border */
+            border-radius: 5px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="%23e63946" d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10s-10-4.486-10-10s4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12s12-5.373 12-12s-5.373-12-12-12zm-1.25 16.5l-4.5-4.5l1.5-1.5l3 3l7.125-7.125l1.775 1.775l-8.9 8.9z"/></svg>') no-repeat left center; /* Checkmark icon */
+            background-size: 16px 16px;
+            padding-left: 25px;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border: 1px solid #457b9d;
+        }
+
+        th, td {
+            border: 1px solid #a8dadc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #457b9d;
+            color: white;
+        }
+
+        .navigation {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px; /* Add margin below buttons */
+        }
+
+        .nav-button {
+            font-family: 'Mochiy Pop One', cursive;
+            background-color: #e63946; /* Reddish accent */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .nav-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            background-color: #c0392b; /* Darker red on hover */
+        }
+
+        .slide-counter {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #457b9d;
+        }
+
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px dashed #e63946;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+
+        .question p {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .question ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .question ul li {
+            background: none; /* Remove checkmark for options */
+            padding-left: 0;
+            margin-bottom: 5px;
+        }
+
+        .answer {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f1faee;
+            border: 1px solid #a8dadc;
+            border-radius: 5px;
+            display: none; /* Hide answers initially */
+        }
+
+        .show-answer-button {
+             font-family: 'Mochiy Pop One', cursive;
+             background-color: #457b9d; /* Muted blue */
+             color: white;
+             border: none;
+             padding: 5px 10px;
+             margin-top: 10px;
+             border-radius: 5px;
+             cursor: pointer;
+             font-size: 0.9em;
+             transition: background-color 0.3s ease;
+        }
+
+         .show-answer-button:hover {
+             background-color: #1d3557; /* Darker blue on hover */
+         }
+
+        .references-list {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #a8dadc;
+        }
+
+        .references-list li {
+            background: none; /* Remove checkmark for references */
+            padding-left: 0;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+         .references-list li a {
+             color: #1d3557; /* Dark blue for links */
+             text-decoration: underline;
+         }
+         .references-list li a:hover {
+             color: #e63946; /* Reddish accent on hover */
+         }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .slide-container {
+                padding: 20px;
+            }
+            .slide {
+                 padding: 20px;
+            }
+            .nav-button {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+             h2 {
+                font-size: 1.3em;
+            }
+             h3 {
+                font-size: 1.1em;
+            }
+             table th, table td {
+                 padding: 8px;
+                 font-size: 0.9em;
+             }
+             .question, .answer {
+                 padding: 10px;
+             }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container">
+        <div class="slide active">
+            <h1>📝 訪問介護費の仕組みガイド 📝</h1>
+            <h2>I. はじめに</h2>
+            <p>住み慣れた自宅や地域で安心して生活するために、訪問介護（ホームヘルプサービス）はとても大切なサービスです。多くの方々にとって、その費用がどのように決まるのかは重要な関心事です。</p>
+            <p>このページでは、介護保険制度における訪問介護サービスの費用がどのように構成され、利用者の負担額がどうなるのかを、分かりやすくお伝えします。サービスを使う方、ご家族、サービスを提供する事業者、そして制度に関わる方々など、様々な立場の皆さんがこの仕組みを理解することで、サービスの適切な利用とスムーズな運営につながります。</p>
+            <p>このガイドを通して、訪問介護費用の全体像を知り、日々の疑問や不明点を解消するお手伝いができれば幸いです。</p>
+        </div>
+
+        <div class="slide">
+            <h1>📝 訪問介護費の仕組みガイド 📝</h1>
+            <h2>II. 介護保険制度の概要</h2>
+            <p>日本の介護保険制度は、高齢社会を支えるための社会保険制度です。訪問介護サービスも、この制度に基づいて提供されています。</p>
+            <ul>
+                <li>
+                    <strong>財源は？</strong><br>
+                    原則として、40歳以上の皆さんが納める保険料と、国や自治体の公費（税金）で運営されています。
+                </li>
+                <li>
+                    <strong>誰が使えるの？</strong><br>
+                    65歳以上の方（第1号被保険者）や、特定の病気が原因で介護が必要になった40歳から64歳までの方（第2号被保険者）が対象です。
+                </li>
+                <li>
+                    <strong>どうすれば使える？</strong><br>
+                    「要介護認定」または「要支援認定」を受けると、介護保険のサービスを自己負担割合に応じて利用できるようになります。
+                </li>
+            </ul>
+            <p>訪問介護サービスの費用は、サービスの種類や時間ごとに決められた「単位数」を使って計算されます。この単位数に、地域ごとに定められた「地域単価」を掛け合わせて算出される仕組みです。</p>
+            <p>地域単価は、国が定める基本単価を基に、地域の物価や人件費などを考慮して設定されており、<strong>お住まいの地域によって異なります。</strong></p>
+            <div class="note">
+                💡 サービスの費用は「単位数 × 地域単価」で計算されるよ！<br>
+                地域単価は住んでいる場所によって違うんだね！
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>📝 訪問介護費の仕組みガイド 📝</h1>
+            <h2>III. 費用の構成要素</h2>
+            <p>訪問介護サービスを利用する際の費用は、主に以下の要素で構成されます。</p>
+
+            <h3>1. 基本単位と地域単価</h3>
+            <p>訪問介護サービスの費用は、サービス内容ごとに定められた「基本単位」に、お住まいの地域の「地域単価」を乗じて計算されます。</p>
+            <ul>
+                <li>
+                    <strong>基本単位:</strong> 国がサービス内容や時間ごとに定めています。全国一律です。
+                </li>
+                <li>
+                    <strong>地域単価:</strong> 地域の物価や人件費などを考慮して設定され、お住まいの地域（市区町村）によって異なります。
+                </li>
+            </ul>
+            <p>費用は、この「基本単位 × 地域単価」で算出されます。例えば、基本単位が200単位のサービスを地域単価10.84円の地域で利用した場合、費用は200単位 × 10.84円 = 2,168円となります。</p>
+        </div>
+
+        <div class="slide">
+             <h1>📝 訪問介護費の仕組みガイド 📝</h1>
+             <h2>III. 費用の構成要素 (続き)</h2>
+            <h3>2. 身体介護の費用</h3>
+            <p>身体介護は、利用者の体に直接触れて行う介助サービスです。これには、入浴介助、排せつ介助、食事介助、体位変換、服薬介助、移動・移乗の介助などが含まれます。</p>
+            <p>費用は、サービス時間によって細かく区分されており、それぞれの時間区分に対応する基本単位が定められています。</p>
+            <p>【サービス時間区分と基本単位の例】<br>（※詳細は介護報酬改定等で変更される場合があります）</p>
+            <ul>
+                <li>20分未満</li>
+                <li>20分以上30分未満</li>
+                <li>30分以上1時間未満</li>
+                <li>1時間以上1時間30分未満</li>
+                <li>以降、30分ごとに加算</li>
+            </ul>
+            <p>これらの時間区分ごとの基本単位に地域単価を乗じ、さらに自己負担割合（1～3割）をかけたものが、利用者負担額となります。</p>
+        </div>
+
+        <div class="slide">
+             <h1>📝 訪問介護費の仕組みガイド 📝</h1>
+             <h2>III. 費用の構成要素 (続き)</h2>
+            <h3>3. 生活援助の費用</h3>
+            <p>生活援助は、利用者本人やご家族が病気や障害などのために家事を行うことが困難な場合に行われる家事サポートです。これには、掃除、洗濯、調理、買い物、薬の受け取りなどが含まれます。</p>
+            <div class="note">
+                ⚠️ 生活援助は、あくまで利用者本人の日常生活を援助するためのものであり、利用者本人やご家族のために行うことが原則です。同居家族がいる場合は、原則として生活援助は利用できませんが、特別な事情がある場合はケアマネジャーの判断により認められることがあります。
+            </div>
+            <p>生活援助も、サービス時間によって基本単位が定められています。</p>
+             <p>【サービス時間区分と基本単位の例】<br>（※詳細は介護報酬改定等で変更される場合があります）</p>
+            <ul>
+                <li>20分以上45分未満</li>
+                <li>45分以上</li>
+            </ul>
+            <p>これらの時間区分ごとの基本単位に地域単価を乗じ、自己負担割合をかけたものが利用者負担額となります。</p>
+        </div>
+
+         <div class="slide">
+             <h1>📝 訪問介護費の仕組みガイド 📝</h1>
+             <h2>III. 費用の構成要素 (続き)</h2>
+            <h3>4. 通院等のための乗降介助の費用</h3>
+            <p>通院等のための乗降介助は、通院や官公署への手続きなどのために、介護タクシーなどを利用する際に、ヘルパーが車両への乗降を介助するサービスです。</p>
+            <ul>
+                <li>
+                    このサービスは、<strong>片道ごと</strong>に基本単位が定められています。
+                </li>
+                <li>
+                    ヘルパーによる乗降介助の費用は介護保険の対象となりますが、<strong>介護タクシーなどの運賃は介護保険の対象外となり、別途全額自己負担</strong>となります。
+                </li>
+                <li>
+                    居宅や目的地での移動の介助（ベッドから車いすへの移乗、院内での移動介助など）は、別途、身体介護として算定される場合があります。
+                </li>
+            </ul>
+            <p>乗降介助の基本単位に地域単価を乗じ、自己負担割合をかけたものが利用者負担額となります。</p>
+        </div>
+
+
+        <div class="slide">
+            <h1>📝 訪問介護費の仕組みガイド 📝</h1>
+            <h2>IV. 要介護度・要支援度による費用の違い</h2>
+            <p>サービスの費用は、皆さんの要介護度や要支援度によっても異なります。一般的に、介護の必要度が高い（要介護度が高い）ほど、必要なサービスが増えるため費用も高くなります。</p>
+
+            <ul>
+                <li>
+                    <strong>要介護1～5の方（訪問介護）</strong><br>
+                    身体介護や生活援助を中心に、サービス時間や内容に応じた費用がかかります。（※地域単価によって変動します）<br>
+                    例：ある地域での1割負担の目安（1回あたり）<br>
+                    - 要介護1の身体介護: 約431円<br>
+                    - 要介護5の身体介護: 約686円<br>
+                    （要介護度が高くなるにつれて費用が増える傾向があります。）
+                </li>
+                <li>
+                    <strong>要支援1・2の方（介護予防訪問型サービス）</strong><br>
+                    月単位の定額料金が設定されていることが多いです。これは、週に何回程度サービスを利用するかで決まります。（※地域単価によって変動します）<br>
+                    【1割負担の場合の月額目安料金例】<br>
+                    - 週1回程度の利用: 月額 約1,275円 ～ 1,278円<br>
+                    - 週2回程度の利用: 月額 約2,555円<br>
+                    - それ以上の利用: 月額 約4,151円
+                </li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h1>📝 訪問介護費の仕組みガイド 📝</h1>
+            <h2>V. 利用者負担と保険給付</h2>
+            <p>介護保険サービスを利用する際、かかった費用のうち、原則として<strong>1割から3割</strong>を自分で負担します。</p>
+            <ul>
+                <li>
+                    <strong>自己負担割合はどう決まる？</strong><br>
+                    前年の所得に応じて決定され、「介護保険負担割合証」に記載されています。所得が高い方は2割または3割負担となります。
+                </li>
+            </ul>
+
+            <h3>利用者負担軽減制度について</h3>
+            <p>お住まいの市区町村によっては、所得が低い方などを対象に、利用者負担の一部を助成する制度を設けている場合があります。</p>
+            <ul>
+                <li>
+                    制度の有無や内容は、<strong>お住まいの市区町村によって異なります。</strong>
+                </li>
+                <li>
+                    利用するには、多くの場合、事前の申請が必要です。
+                </li>
+            </ul>
+
+            <h3>支給限度額について</h3>
+            <p>介護保険から給付される金額には、要介護度ごとに上限（<strong>支給限度額</strong>）が決められています。この上限は「単位」で設定されています。</p>
+            <ul>
+                <li>
+                    例：要介護5の方の場合、1ヶ月あたり36,217単位が上限目安です。
+                </li>
+            </ul>
+            <p>この支給限度額を超えてサービスを利用した場合、<strong>超過分の費用は全額自己負担</strong>となります。</p>
+            <div class="note">
+                ケアマネジャーさんと相談して、支給限度額内で必要なサービスを計画することが大切です！
+            </div>
+        </div>
+
+         <div class="slide">
+            <h1>📝 訪問介護費の仕組みガイド 📝</h1>
+            <h2>VI. 追加料金と考慮事項</h2>
+            <p>基本料金以外に、サービスを利用する時間帯などによって追加料金が発生する場合があります。</p>
+
+            <h3>1. 時間帯による加算</h3>
+            <p>以下の時間帯にサービスを利用する場合、基本料金に割増料金が加算されます。</p>
+            <ul>
+                <li>
+                    <strong>早朝 (午前6時～午前8時)</strong> または <strong>夜間 (午後6時～午後10時)</strong><br>
+                    → 基本料金の<strong>25%増し</strong>
+                </li>
+                <li>
+                    <strong>深夜 (午後10時～午前6時)</strong><br>
+                    → 基本料金の<strong>50%増し</strong>
+                </li>
+            </ul>
+            <p>これは、介護職員の時間外労働に対する手当として設けられています。</p>
+
+            <h3>2. 複数ヘルパーによるサービス提供</h3>
+            <p>身体介護や生活援助で、同時に2人の訪問介護員がサービスを提供した場合、基本利用料の<strong>2倍</strong>の額となります。これは、より手厚いケアが必要な場合や、安全にサービスを提供するために行われます。</p>
+        </div>
+
+         <div class="slide">
+            <h1>📝 訪問介護費の仕組みガイド 📝</h1>
+            <h2>VI. 追加料金と考慮事項 (続き)</h2>
+            <h3>3. 各種加算</h3>
+            <p>サービスの質を高めたり、事業所の体制を評価したりするために、様々な加算が基本料金に上乗せされることがあります。</p>
+            <ul>
+                <li>
+                    <strong>サービス提供体制強化加算</strong><br>
+                    質の高いサービスを提供するための体制を整えている事業所に加算されます。
+                </li>
+                <li>
+                    <strong>介護職員処遇改善加算</strong><br>
+                    介護職員の賃金改善を目的として加算されます。
+                </li>
+                <li>
+                    その他、緊急時訪問介護加算、初回加算など、様々な加算があります。
+                </li>
+            </ul>
+            <p>これらの加算も、皆さんの自己負担額に影響します。加算の種類や要件は、介護報酬改定等で変更されることがあります。</p>
+        </div>
+
+        <div class="slide">
+            <h1>📝 訪問介護費の仕組みガイド 📝</h1>
+            <h2>VII. 自費サービス</h2>
+            <p>介護保険の対象とならないサービスや、保険給付の支給限度額を超えて利用するサービスは、「自費サービス」として提供されます。この場合の費用は、全額自己負担となります。</p>
+            <ul>
+                <li>
+                    <strong>どんなサービスがあるの？</strong><br>
+                    ペットの世話、庭の手入れ、大掃除、窓ふき、同居家族の部屋の掃除、お墓参りの同行など、日常生活の範囲を超える援助や、利用者本人以外の家族のための援助などが含まれる場合があります。
+                </li>
+                <li>
+                    <strong>費用は？</strong><br>
+                    自費サービスの料金は、事業所が自由に設定しています。利用を希望する場合は、事前に事業所に料金やサービス内容を確認しましょう。保険給付の対象にはなりません。
+                </li>
+            </ul>
+        </div>
+
+         <div class="slide">
+            <h1>📝 訪問介護費の仕組みガイド 📝</h1>
+            <h2>VIII. 費用の計算例</h2>
+            <p>訪問介護費用の計算例をいくつかご紹介します。これはあくまで基本的な例であり、実際の費用はサービス内容、時間、加算の有無、そして地域単価によって異なります。</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ケース</th>
+                        <th>要介護度</th>
+                        <th>サービス内容</th>
+                        <th>時間/頻度</th>
+                        <th>時間帯</th>
+                        <th>自己負担割合</th>
+                        <th>自己負担額（目安）</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>例1</td>
+                        <td>要介護1</td>
+                        <td>身体介護</td>
+                        <td>30分</td>
+                        <td>通常</td>
+                        <td>1割</td>
+                        <td>約288円</td>
+                    </tr>
+                     <tr>
+                        <td>例2</td>
+                        <td>要支援2</td>
+                        <td>生活援助（介護予防）</td>
+                        <td>週1回程度/月</td>
+                        <td>通常</td>
+                        <td>1割</td>
+                        <td>月額 約1,275円</td>
+                    </tr>
+                     <tr>
+                        <td>例3</td>
+                        <td>要介護3</td>
+                        <td>身体介護</td>
+                        <td>60分</td>
+                        <td>午後7時（夜間加算）</td>
+                        <td>1割</td>
+                        <td>約570円</td>
+                    </tr>
+                     <tr>
+                        <td>例4</td>
+                        <td>要介護5</td>
+                        <td>身体介護</td>
+                        <td>60分</td>
+                        <td>通常</td>
+                        <td>1割</td>
+                        <td>約686円（※要介護度による違いの例）</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>※上記の金額はあくまで一般的な目安です。実際の費用は、利用する事業所やお住まいの地域の地域単価、詳細なサービス内容、加算の種類によって変動します。正確な費用は、ケアプランや事業所からの請求書をご確認ください。</p>
+        </div>
+
+        <div class="slide">
+            <h1>📝 訪問介護費の仕組みガイド 📝</h1>
+            <h2>IX. 確認テスト</h2>
+            <p>これまでの内容を振り返って、簡単なテストに挑戦してみましょう！</p>
+
+            <div class="question">
+                <p>Q1: 訪問介護サービスの費用は、「単位数」と何によって計算されますか？</p>
+                <ul>
+                    <li>A. サービス提供者の経験年数</li>
+                    <li>B. 利用者の年齢</li>
+                    <li>C. 地域単価</li>
+                    <li>D. サービス提供事業所の規模</li>
+                </ul>
+                <button class="show-answer-button">解答を見る</button>
+                <div class="answer">
+                    正解: C. 地域単価
+                </div>
+            </div>
+
+             <div class="question">
+                <p>Q2: 介護保険サービスを利用する際の自己負担割合は、原則として何割から何割ですか？</p>
+                <ul>
+                    <li>A. 0割から1割</li>
+                    <li>B. 1割から3割</li>
+                    <li>C. 2割から4割</li>
+                    <li>D. 3割から5割</li>
+                </ul>
+                 <button class="show-answer-button">解答を見る</button>
+                <div class="answer">
+                    正解: B. 1割から3割
+                </div>
+            </div>
+
+             <div class="question">
+                <p>Q3: 早朝（午前6時～午前8時）に訪問介護サービスを利用した場合、基本料金に何%の割増料金が加算されますか？</p>
+                <ul>
+                    <li>A. 10%</li>
+                    <li>B. 25%</li>
+                    <li>C. 50%</li>
+                    <li>D. 加算されない</li>
+                </ul>
+                 <button class="show-answer-button">解答を見る</button>
+                <div class="answer">
+                    正解: B. 25%
+                </div>
+            </div>
+
+             <div class="question">
+                <p>Q4: 同居家族がいる場合に、訪問介護で家事代行（生活援助）を依頼することは、原則として可能ですか？</p>
+                <ul>
+                    <li>A. 可能</li>
+                    <li>B. 不可能</li>
+                    <li>C. ケアマネジャーの判断による</li>
+                    <li>D. 市町村の許可が必要</li>
+                </ul>
+                 <button class="show-answer-button">解答を見る</button>
+                <div class="answer">
+                    正解: B. 不可能（※特別な事情がある場合はケアマネジャーに相談）
+                </div>
+            </div>
+
+        </div>
+        <div class="slide">
+            <h1>📝 訪問介護費の仕組みガイド 📝</h1>
+            <h2>X. まとめと参考情報</h2>
+            <p>このガイドでは、介護保険制度における訪問介護費用の仕組みについて、制度の概要から費用の内訳、利用者負担、追加料金、自費サービス、計算例、よくある質問、確認テストまで、詳しく見てきました。訪問介護サービスを上手に利用し、費用について理解することは、皆さんが安心して生活を送る上でとても大切です。</p>
+            <p>より詳しい情報や、ご自身の状況に合わせた相談は、以下の窓口にお問い合わせください。</p>
+            <ul>
+                <li><strong>お住まいの市区町村の介護保険担当窓口</strong>: 制度全般、利用者負担軽減制度などに関するお問い合わせ</li>
+                <li><strong>地域包括支援センター</strong>: 介護に関する相談やケアプラン作成の支援</li>
+                <li><strong>利用を検討している/利用している訪問介護サービス事業所</strong>: 個別のサービス内容や料金に関するお問い合わせ</li>
+            </ul>
+
+            <h3 class="references-list">参考文献</h3>
+            <ul class="references-list">
+                <li><a href="https://www.city.funabashi.lg.jp/senior/kaigo/0001/p031306_d/fil/07.pdf" target="_blank">www.city.funabashi.lg.jp (船橋市 訪問介護)</a></li>
+                <li><a href="https://www.minnanokaigo.com/guide/care-insurance/area-adjustment/" target="_blank">【2025年最新】介護報酬の単位一覧表（介護サービス×地域区分ごとの上乗せ加算） - みんなの介護</a></li>
+                <li><a href="http://www.city.funabashi.lg.jp/kenkou/kaigo/004/p010100.html" target="_blank">利用者負担助成制度について｜船橋市公式ホームページ</a></li>
+                <li><a href="https://www.city.funabashi.lg.jp/kenkou/kaigo/004/index.html" target="_blank">受けられる介護サービス - 船橋市</a></li>
+                <li><a href="https://www.city.funabashi.lg.jp/kenkou/kaigo/004/p100101.html" target="_blank">訪問介護についてのよくあるご相談｜船橋市公式ホームページ</a></li>
+                <li><a href="https://fh-comini.jp/kaigo/" target="_blank">介護することになったら… - 船橋市訪問介護事業者連絡会</a></li>
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" disabled>◀ 前のスライド</button>
+        <span class="slide-counter" id="slideCounter">1 / 13</span> <button class="nav-button" id="nextBtn">次のスライド ▶</button>
+    </div>
+
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const slideCounter = document.getElementById('slideCounter');
+        let currentSlideIndex = 0;
+
+        // Function to show a specific slide
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                if (i === index) {
+                    slide.classList.add('active');
+                    slide.style.opacity = 1;
+                    slide.style.visibility = 'visible';
+                     // Ensure content is visible if overflowed
+                    slide.scrollTop = 0;
+                } else {
+                    slide.classList.remove('active');
+                    slide.style.opacity = 0;
+                    slide.style.visibility = 'hidden';
+                }
+            });
+            updateNavigationButtons();
+            updateSlideCounter();
+        }
+
+        // Function to update button states
+        function updateNavigationButtons() {
+            prevBtn.disabled = currentSlideIndex === 0;
+            nextBtn.disabled = currentSlideIndex === slides.length - 1;
+        }
+
+        // Function to update slide counter text
+        function updateSlideCounter() {
+            slideCounter.textContent = `${currentSlideIndex + 1} / ${slides.length}`;
+        }
+
+        // Event listeners for navigation buttons
+        prevBtn.addEventListener('click', () => {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                showSlide(currentSlideIndex);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlideIndex < slides.length - 1) {
+                currentSlideIndex++;
+                showSlide(currentSlideIndex);
+            }
+        });
+
+        // Add event listeners for "解答を見る" buttons
+        document.querySelectorAll('.show-answer-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const answerDiv = button.nextElementSibling;
+                if (answerDiv && answerDiv.classList.contains('answer')) {
+                    answerDiv.style.display = 'block'; // Show the answer
+                    button.style.display = 'none'; // Hide the button after clicking
+                }
+            });
+        });
+
+
+        // Initial display
+        showSlide(currentSlideIndex);
+
+         // Adjust slide container height based on active slide content
+        function adjustContainerHeight() {
+            const activeSlide = document.querySelector('.slide.active');
+            if (activeSlide) {
+                 // Set height to auto first to measure content
+                activeSlide.style.height = 'auto';
+                const contentHeight = activeSlide.scrollHeight;
+                 // Set container height based on content height + padding
+                const container = document.querySelector('.slide-container');
+                const padding = parseInt(getComputedStyle(container).paddingTop) + parseInt(getComputedStyle(container).paddingBottom);
+                container.style.height = `${contentHeight + padding}px`;
+                 // Reset slide height to 100% after container height is set
+                 // This is a bit tricky with absolute positioning, might need refinement
+                 // For simplicity, let's keep slide height auto and let container manage overflow
+                 activeSlide.style.height = 'auto'; // Keep auto for scrolling
+            }
+        }
+
+        // Adjust height on slide change and window resize
+        // Note: Dynamic height adjustment for absolute positioned elements is complex.
+        // The current setup allows scrolling within the slide if content exceeds container height.
+        // A more robust solution might involve different layout approaches or libraries.
+
+        // Initial height adjustment (optional, as overflow-y: auto handles it)
+        // adjustContainerHeight();
+
+        // window.addEventListener('resize', adjustContainerHeight); // Optional: if dynamic height is needed on resize
+
+    </script>
+</body>
+</html>
